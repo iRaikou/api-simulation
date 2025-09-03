@@ -123,4 +123,28 @@ router.get("/test", async (req, res) => {
 //   }
 // });
 
+router.post("/check-credentials", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ exists: false, message: "User not found" });
+    }
+
+    // Compare password as plain string
+    if (user.password !== password) {
+      return res
+        .status(401)
+        .json({ exists: false, message: "Invalid password" });
+    }
+
+    // ✅ Success
+    res.json({ exists: true, message: "User exists" });
+  } catch (err) {
+    res.status(500).json({ exists: false, message: err.message });
+  }
+});
+
 export default router;
